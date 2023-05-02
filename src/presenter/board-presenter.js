@@ -1,21 +1,23 @@
-import {render} from '../render';
+import { render, RenderPosition } from '../render';
 import BoardView from '../view/board-view';
 import EditFormView from '../view/edit-form-view';
 import PointView from '../view/point-view';
 
-const ITEMS_COUNT = 3;
 export default class BoardPresenter {
   boardComponent = new BoardView();
-  constructor({boardContainer}) {
+  constructor({boardContainer, pointsModel}) {
     this.boardContainer = boardContainer;
+    this.pointsModel = pointsModel;
   }
 
   init() {
-    render(this.boardComponent, this.boardContainer);
-    render(new EditFormView(), this.boardComponent.getElement());
 
-    for (let i = 0; i < ITEMS_COUNT; i++) {
-      render(new PointView(), this.boardComponent.getElement());
+    this.boardPoints = [...this.pointsModel.getPoints()];
+    render(this.boardComponent, this.boardContainer);
+    for (let i = 0; i < this.boardPoints.length; i++) {
+      render(new PointView({point: this.boardPoints[i]}), this.boardComponent.getElement());
     }
+
+    render(new EditFormView({point: this.boardPoints[0]}), this.boardComponent.getElement(), RenderPosition.AFTERBEGIN);
   }
 }
