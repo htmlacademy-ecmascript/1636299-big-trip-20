@@ -1,12 +1,13 @@
-import { render } from '../render.js';
-import ContentListView from '../view/board-view.js';
-import PointFormView from '../view/point-form-view.js';
-import PointView from '../view/point-view.js';
+import {render, replace} from '../framework/render';
+import ContentListView from '../view/board-view';
+import PointFormView from '../view/point-form-view';
+import PointView from '../view/point-view';
+import {isEscapeKey} from '../utils';
 
 export default class ContentPresenter {
   contentListComponent = new ContentListView();
 
-  constructor({ contentContainer, pointsModel }) {
+  constructor({contentContainer, pointsModel}) {
     this.contentContainer = contentContainer;
     this.pointsModel = pointsModel;
   }
@@ -17,24 +18,56 @@ export default class ContentPresenter {
     this.destinations = [...this.pointsModel.getDestinations()];
 
     render(this.contentListComponent, this.contentContainer);
-    render(
-      new PointFormView({
-        point: this.points[0],
+    for (let i = 0; i < this.points.length; i++) {
+      this.renderPoint({
+        point: this.points[i],
         offers: this.offers,
         destinations: this.destinations,
-      }),
-      this.contentListComponent.getElement()
-    );
-
-    for (let i = 0; i < this.points.length; i++) {
-      render(
-        new PointView({
-          point: this.points[i],
-          offers: this.offers,
-          destinations: this.destinations,
-        }),
-        this.contentListComponent.getElement()
-      );
+      });
     }
+  }
+
+  renderPoint({point, offers, destinations}) {
+    const eventComponent = new PointView({
+      point,
+      offers,
+      destinations,
+      onEditClick: () => {
+        replaceEventToEventForm();
+        document.addEventListener('keydown', onEscKey);
+      },
+    });
+
+    const eventFormComponent = new PointFormView({
+      point,
+      offers,
+      destinations,
+      onFormSubmit: () => {
+        replaceEventFormToEvent();
+        document.removeEventListener('keydown', onEscKey);
+      },
+      onRollUpClick: () => {
+        replaceEventFormToEvent();
+        document.removeEventListener('keydown', onEscKey);
+      },
+    });
+
+    function onEscKey(evt) {
+      if (isEscapeKey(evt)) {
+        evt.preventDefault();
+        replaceEventFormToEvent();
+        document.removeEventListener('keydown', onEscKey);
+      }
+    }
+
+    function replaceEventToEventForm() {
+      replace(eventFormComponent, eventComponent);
+    }
+
+    function replaceEventFormToEvent() {
+      replace(eventComponent, eventFormComponent);
+    }
+
+    render(eventComponent, this.contentListComponent.element);
   }
 }

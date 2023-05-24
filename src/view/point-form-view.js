@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { POINT_TYPES } from '../const';
 import { humanizePointDate, FULL_DATE_FORMAT } from '../utils.js';
 
@@ -136,26 +136,35 @@ const createPointFormTemplate = (point, allOffers, allDestinations) => {
       `;
 };
 
-export default class PointFormView {
-  constructor({ point, offers, destinations }) {
+export default class PointFormView extends AbstractView {
+  constructor({ point, offers, destinations, onFormSubmit, onRollUpClick }) {
+    super();
     this.point = point;
     this.offers = offers;
     this.destinations = destinations;
+    this.handleFormSubmit = onFormSubmit;
+    this.handleRollUpClick = onRollUpClick;
+
+    this.element
+      .querySelector('form')
+      .addEventListener('submit', this.formSubmitHandler);
+
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.rollUpButtonClick);
   }
 
-  getTemplate() {
+  get template() {
     return createPointFormTemplate(this.point, this.offers, this.destinations);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.handleFormSubmit();
+  };
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  rollUpButtonClick = (evt) => {
+    evt.preventDefault();
+    this.handleRollUpClick();
+  };
 }
