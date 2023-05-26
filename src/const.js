@@ -33,4 +33,11 @@ const DESCRIPTIONS = [
   'In rutrum ac purus sit amet tempus.',
 ];
 
-export { POINT_TYPES, OFFERS, DESCRIPTIONS };
+const FILTER_TYPES = {
+  FUTURE: 'Future',
+  PRESENT: 'Present',
+  PAST: 'Past',
+  EVERYTHING: 'Everything',
+};
+
+export {POINT_TYPES, OFFERS, DESCRIPTIONS, FILTER_TYPES};

@@ -1,5 +1,5 @@
-import {getRandomArrayElement, getRandomNumber} from '../utils';
-import { DESCRIPTIONS} from '../const';
+import {getRandomArrayElement, getRandomNumber} from '../utils/common';
+import {DESCRIPTIONS} from '../const';
 
 export const destinations = [
   {

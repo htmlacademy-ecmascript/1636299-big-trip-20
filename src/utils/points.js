@@ -1,6 +1,8 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 const DATE_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
@@ -14,6 +16,8 @@ const MS_IN_DAY = 86400000;
 
 dayjs.extend(utc);
 dayjs.extend(duration);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const humanizePointDate = (time, format) => time ? dayjs(time).utc().format(format) : '';
 
@@ -41,20 +45,24 @@ const countTimeDuration = (startDate, endDate) => {
   return eventDuration;
 };
 
-const getRandomArrayElement = (items) => items[Math.floor(Math.random() * items.length)];
+const isPointDateExpired = (endDate) => endDate && dayjs().isAfter(endDate, 'D');
 
-const getRandomNumber = (a, b) => {
+const isPointDateInFuture = (startDate) => startDate && dayjs().isBefore(startDate, 'D');
 
-  if (a < 0 || b < 0) {
-    return NaN;
-  }
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-  const result = Math.random() * (upper - lower + 1) + lower;
+const isPointDateInPresent = (startDate, endDate) => {
+  const startIsSameOrBeforeToday = dayjs().isSameOrAfter(dayjs(startDate), 'day');
+  const endIsSameOrAfterToday = dayjs().isSameOrBefore(dayjs(endDate).format(), 'D');
 
-  return Math.floor(result);
+  return startIsSameOrBeforeToday && endIsSameOrAfterToday;
 };
 
-const isEscapeKey = (evt) => evt.key === 'Escape';
-
-export { humanizePointDate, isEscapeKey, countTimeDuration, getRandomArrayElement, getRandomNumber, FULL_DATE_FORMAT, DATE_FORMAT, TIME_FORMAT,};
+export {
+  humanizePointDate,
+  countTimeDuration,
+  isPointDateExpired,
+  isPointDateInFuture,
+  isPointDateInPresent,
+  FULL_DATE_FORMAT,
+  DATE_FORMAT,
+  TIME_FORMAT
+};

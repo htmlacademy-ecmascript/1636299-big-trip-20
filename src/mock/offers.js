@@ -1,5 +1,5 @@
-import { POINT_TYPES, OFFERS } from '../const.js';
-import { getRandomNumber, getRandomArrayElement } from '../utils.js';
+import {POINT_TYPES, OFFERS} from '../const';
+import {getRandomNumber, getRandomArrayElement} from '../utils/common';
 
 export const offers = [
   {
