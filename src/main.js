@@ -1,9 +1,9 @@
-import { render, RenderPosition } from './render.js';
-import TripInfoView from './view/info-view.js';
-import FiltersView from './view/filter-view.js';
-import SortView from './view/sort-view.js';
-import ContentPresenter from './presenter/content-presenter.js';
-import PointsModel from './model/model.js';
+import { render, RenderPosition } from './framework/render';
+import TripInfoView from './view/info-view';
+import FiltersView from './view/filter-view';
+import SortView from './view/sort-view';
+import ContentPresenter from './presenter/content-presenter';
+import PointsModel from './model/model';
 
 const tripMainElement = document.querySelector('.trip-main');
 const tripControlsFiltersElement = tripMainElement.querySelector(

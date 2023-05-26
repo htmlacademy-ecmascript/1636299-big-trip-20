@@ -55,4 +55,6 @@ const getRandomNumber = (a, b) => {
   return Math.floor(result);
 };
 
-export { humanizePointDate, countTimeDuration, getRandomArrayElement, getRandomNumber, FULL_DATE_FORMAT, DATE_FORMAT, TIME_FORMAT,};
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
+export { humanizePointDate, isEscapeKey, countTimeDuration, getRandomArrayElement, getRandomNumber, FULL_DATE_FORMAT, DATE_FORMAT, TIME_FORMAT,};
