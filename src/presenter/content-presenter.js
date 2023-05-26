@@ -2,33 +2,34 @@ import {render, replace} from '../framework/render';
 import ContentListView from '../view/board-view';
 import PointFormView from '../view/point-form-view';
 import PointView from '../view/point-view';
-import {isEscapeKey} from '../utils';
+import SortView from '../view/sort-view';
+import EmptyListMessage from '../view/empty-list-view';
+import {isEscapeKey} from '../utils/common';
 
 export default class ContentPresenter {
-  contentListComponent = new ContentListView();
+  #contentListComponent = new ContentListView();
+  #eventPoints = [];
 
-  constructor({contentContainer, pointsModel}) {
-    this.contentContainer = contentContainer;
-    this.pointsModel = pointsModel;
+  #eventContainer = null;
+  #pointsModel = null;
+  #destinationsModel = null;
+  #offersModel = null;
+
+  constructor({eventContainer, pointsModel, offersModel, destinationsModel}) {
+    this.#eventContainer = eventContainer;
+    this.#pointsModel = pointsModel;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
   }
 
   init() {
-    this.points = [...this.pointsModel.getPoints()];
-    this.offers = [...this.pointsModel.getOffers()];
-    this.destinations = [...this.pointsModel.getDestinations()];
+    this.#eventPoints = [...this.#pointsModel.points];
 
-    render(this.contentListComponent, this.contentContainer);
-    for (let i = 0; i < this.points.length; i++) {
-      this.renderPoint({
-        point: this.points[i],
-        offers: this.offers,
-        destinations: this.destinations,
-      });
-    }
+    this.#renderEvents();
   }
 
-  renderPoint({point, offers, destinations}) {
-    const eventComponent = new PointView({
+  #renderPoint({point, offers, destinations}) {
+    const pointComponent = new PointView({
       point,
       offers,
       destinations,
@@ -58,14 +59,31 @@ export default class ContentPresenter {
     }
 
     function replaceEventToEventForm() {
-      replace(eventFormComponent, eventComponent);
+      replace(eventFormComponent, pointComponent);
     }
 
     function replaceEventFormToEvent() {
-      replace(eventComponent, eventFormComponent);
+      replace(pointComponent, eventFormComponent);
       document.removeEventListener('keydown', onEscKey);
     }
 
-    render(eventComponent, this.contentListComponent.element);
+    render(pointComponent, this.#contentListComponent.element);
+  }
+
+  #renderEvents() {
+    if (!this.#eventPoints.length) {
+      render(new EmptyListMessage(), this.#eventContainer);
+    } else {
+      render(new SortView(), this.#eventContainer);
+      render(this.#contentListComponent, this.#eventContainer);
+
+      for (let i = 0; i < this.#eventPoints.length; i++) {
+        this.#renderPoint({
+          point: this.#eventPoints[i],
+          offers: this.#offersModel.getOffersByType(this.#eventPoints[i].type),
+          destinations: this.#destinationsModel.getDestinationById(this.#eventPoints[i].destination)
+        });
+      }
+    }
   }
 }

@@ -1,34 +1,17 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import { humanizePointDate, countTimeDuration, DATE_FORMAT, TIME_FORMAT} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view';
+import {humanizePointDate, countTimeDuration, DATE_FORMAT, TIME_FORMAT} from '../utils/points';
 
-const createPointTemplate = (point, allOffers, allDestinations) => {
-  const { basePrice, dateFrom, dateTo, destination, isFavorite, type, offers } = point;
+const createPointTemplate = (point, offersByType, destinationById) => {
+  const {basePrice, dateFrom, dateTo, isFavorite, type, offers} = point;
   const date = humanizePointDate(dateFrom, DATE_FORMAT);
   const timeFrom = humanizePointDate(dateFrom, TIME_FORMAT);
   const timeTo = humanizePointDate(dateTo, TIME_FORMAT);
   const timeDuration = countTimeDuration(dateFrom, dateTo);
-  const getDestination = (pointDestination) => {
-    const choosenDestination = allDestinations.find((item) =>
-      String(pointDestination).includes(item.id)
-    );
-    return choosenDestination.name;
-  };
 
   const favoriteClass = isFavorite ? 'event__favorite-btn--active' : '';
 
-  const getRandomOffer = (pointType, pointOffers) => {
-    const pointTypeOffers = allOffers.find(
-      (item) => item.type === pointType
-    ).offers;
-    const choosenOffers = pointTypeOffers.filter((item) =>
-      pointOffers.includes(item.id)
-    );
-    return choosenOffers;
-  };
-
-  function createOfferTemplate() {
-    return getRandomOffer(type, offers).map((item) => `<li class="event__offer"><span class="event__offer-title">${item.title}</span>&plus;&euro;&nbsp;<span class="event__offer-price">${item.price}</span></li>`).join('');
-  }
+  const findChoosenOffers = (choosenOffers) => offersByType.filter((item) => choosenOffers.includes(item.id));
+  const createOfferTemplate = () => findChoosenOffers(offers).map((item) => `<li class="event__offer"><span class="event__offer-title">${item.title}</span>&plus;&euro;&nbsp;<span class="event__offer-price">${item.price}</span></li>`).join('');
   return `
     <li class="trip-events__item">
       <div class="event">
@@ -36,7 +19,7 @@ const createPointTemplate = (point, allOffers, allDestinations) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${getDestination(destination)}
+        <h3 class="event__title">${type} ${destinationById.name}</h3>
         </h3>
         <div class="event__schedule">
           <p class="event__time">
@@ -66,24 +49,29 @@ const createPointTemplate = (point, allOffers, allDestinations) => {
     </li>`;
 };
 export default class PointView extends AbstractView {
-  constructor({ point, offers, destinations, onEditClick }) {
+  #point = null;
+  #offers = null;
+  #destinations = null;
+  #handleEditClick = null;
+
+  constructor({point, offers, destinations, onEditClick}) {
     super();
-    this.point = point;
-    this.offers = offers;
-    this.destinations = destinations;
-    this.handleEditClick = onEditClick;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
+    this.#handleEditClick = onEditClick;
 
     this.element
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this.editClickHandler);
   }
 
-  get template(){
-    return createPointTemplate(this.point, this.offers, this.destinations);
+  get template() {
+    return createPointTemplate(this.#point, this.#offers, this.#destinations);
   }
 
   editClickHandler = (evt) => {
     evt.preventDefault();
-    this.handleEditClick();
+    this.#handleEditClick();
   };
 }

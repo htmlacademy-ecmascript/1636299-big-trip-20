@@ -1,16 +1,11 @@
 import AbstractView from '../framework/view/abstract-view';
-import { POINT_TYPES } from '../const';
-import { humanizePointDate, FULL_DATE_FORMAT } from '../utils.js';
+import {POINT_TYPES} from '../const';
+import {humanizePointDate, FULL_DATE_FORMAT} from '../utils/points';
 
-const createPointFormTemplate = (point, allOffers, allDestinations) => {
-  const { basePrice, dateFrom, dateTo, destination, offers, type } = point;
+const createPointFormTemplate = (point, offersByType, destinationById) => {
+  const {basePrice, dateFrom, dateTo, offers, type} = point;
   const timeFrom = humanizePointDate(dateFrom, FULL_DATE_FORMAT);
   const timeTo = humanizePointDate(dateTo, FULL_DATE_FORMAT);
-
-  const findPointDestination = (randomDestination) =>
-    allDestinations.find((item) => String(randomDestination).includes(item.id));
-
-  const pointDestination = findPointDestination(destination);
 
   const createTypesChooserTemplate = (pointTypes) =>
     Object.values(pointTypes)
@@ -23,12 +18,8 @@ const createPointFormTemplate = (point, allOffers, allDestinations) => {
       )
       .join('');
 
-  const createOffersTemplate = (pointType) => {
-    const pointTypeOffers = allOffers.find(
-      (item) => item.type === pointType
-    ).offers;
-
-    return pointTypeOffers
+  function createOffersTemplate() {
+    return offersByType
       .map((offer) => {
         const checked = offers.includes(offer.id) ? 'checked' : '';
 
@@ -44,10 +35,10 @@ const createPointFormTemplate = (point, allOffers, allDestinations) => {
       `;
       })
       .join('');
-  };
+  }
 
   const createDestinationDescriptionTemplate = (myDestination) => {
-    const { pictures, description } = myDestination;
+    const {pictures, description} = myDestination;
     const destinationPictures = pictures
       .map(
         (picture) => `
@@ -92,7 +83,7 @@ const createPointFormTemplate = (point, allOffers, allDestinations) => {
               id="event-destination-1"
               type="text"
               name="event-destination"
-              value="${pointDestination.name}"
+              value="${destinationById.name}"
               list="destination-list-1">
             <datalist id="destination-list-1">
               <option value="Amsterdam"></option>
@@ -128,7 +119,7 @@ const createPointFormTemplate = (point, allOffers, allDestinations) => {
           </section>
           <section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            ${createDestinationDescriptionTemplate(pointDestination)}
+            ${createDestinationDescriptionTemplate(destinationById)}
           </section>
           </section>
           </form>
@@ -137,13 +128,19 @@ const createPointFormTemplate = (point, allOffers, allDestinations) => {
 };
 
 export default class PointFormView extends AbstractView {
-  constructor({ point, offers, destinations, onFormSubmit, onRollUpClick }) {
+  #point = null;
+  #offers = null;
+  #destinations = null;
+  #handleFormSubmit = null;
+  #handleRollUpClick = null;
+
+  constructor({point, offers, destinations, onFormSubmit, onRollUpClick}) {
     super();
-    this.point = point;
-    this.offers = offers;
-    this.destinations = destinations;
-    this.handleFormSubmit = onFormSubmit;
-    this.handleRollUpClick = onRollUpClick;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleRollUpClick = onRollUpClick;
 
     this.element
       .querySelector('form')
@@ -155,16 +152,16 @@ export default class PointFormView extends AbstractView {
   }
 
   get template() {
-    return createPointFormTemplate(this.point, this.offers, this.destinations);
+    return createPointFormTemplate(this.#point, this.#offers, this.#destinations);
   }
 
   formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.handleFormSubmit();
+    this.#handleFormSubmit();
   };
 
   rollUpButtonClick = (evt) => {
     evt.preventDefault();
-    this.handleRollUpClick();
+    this.#handleRollUpClick();
   };
 }
