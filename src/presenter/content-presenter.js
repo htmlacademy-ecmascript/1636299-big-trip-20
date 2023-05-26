@@ -44,11 +44,9 @@ export default class ContentPresenter {
       destinations,
       onFormSubmit: () => {
         replaceEventFormToEvent();
-        document.removeEventListener('keydown', onEscKey);
       },
       onRollUpClick: () => {
         replaceEventFormToEvent();
-        document.removeEventListener('keydown', onEscKey);
       },
     });
 
@@ -56,7 +54,6 @@ export default class ContentPresenter {
       if (isEscapeKey(evt)) {
         evt.preventDefault();
         replaceEventFormToEvent();
-        document.removeEventListener('keydown', onEscKey);
       }
     }
 
@@ -66,6 +63,7 @@ export default class ContentPresenter {
 
     function replaceEventFormToEvent() {
       replace(eventComponent, eventFormComponent);
+      document.removeEventListener('keydown', onEscKey);
     }
 
     render(eventComponent, this.contentListComponent.element);

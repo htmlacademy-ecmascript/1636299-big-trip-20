@@ -7,7 +7,7 @@ const createPointTemplate = (point, allOffers, allDestinations) => {
   const timeFrom = humanizePointDate(dateFrom, TIME_FORMAT);
   const timeTo = humanizePointDate(dateTo, TIME_FORMAT);
   const timeDuration = countTimeDuration(dateFrom, dateTo);
-  const getRandomDestination = (pointDestination) => {
+  const getDestination = (pointDestination) => {
     const choosenDestination = allDestinations.find((item) =>
       String(pointDestination).includes(item.id)
     );
@@ -36,7 +36,7 @@ const createPointTemplate = (point, allOffers, allDestinations) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${getRandomDestination(destination)}
+        <h3 class="event__title">${type} ${getDestination(destination)}
         </h3>
         <div class="event__schedule">
           <p class="event__time">
