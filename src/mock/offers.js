@@ -1,4 +1,4 @@
-import {POINT_TYPES, OFFERS} from '../const';
+import {POINT_TYPES, OFFERS, MAX_PRICE, MIN_PRICE} from '../const';
 import {getRandomNumber, getRandomArrayElement} from '../utils/common';
 
 export const offers = [
@@ -8,7 +8,7 @@ export const offers = [
       {
         id: '1',
         title: getRandomArrayElement(OFFERS),
-        price: getRandomNumber(10, 5000),
+        price: getRandomNumber(MIN_PRICE, MAX_PRICE)
       },
     ],
   },
@@ -18,12 +18,12 @@ export const offers = [
       {
         id: '1',
         title: getRandomArrayElement(OFFERS),
-        price: getRandomNumber(10, 5000),
+        price: getRandomNumber(MIN_PRICE, MAX_PRICE)
       },
       {
         id: '2',
         title: getRandomArrayElement(OFFERS),
-        price: getRandomNumber(10, 5000),
+        price: getRandomNumber(MIN_PRICE, MAX_PRICE)
       },
     ],
   },
@@ -33,17 +33,17 @@ export const offers = [
       {
         id: '1',
         title: getRandomArrayElement(OFFERS),
-        price: getRandomNumber(10, 5000),
+        price: getRandomNumber(MIN_PRICE, MAX_PRICE)
       },
       {
         id: '2',
         title: getRandomArrayElement(OFFERS),
-        price: getRandomNumber(10, 5000),
+        price: getRandomNumber(MIN_PRICE, MAX_PRICE)
       },
       {
         id: '3',
         title: getRandomArrayElement(OFFERS),
-        price: getRandomNumber(10, 5000),
+        price: getRandomNumber(MIN_PRICE, MAX_PRICE)
       },
     ],
   },
