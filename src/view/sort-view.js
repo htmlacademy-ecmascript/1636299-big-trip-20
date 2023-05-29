@@ -1,16 +1,16 @@
 import AbstractView from '../framework/view/abstract-view';
-import { SORT_TYPES } from '../const';
+import {SORT_TYPES} from '../const';
 
 const enebledSortType = {
-  [SORT_TYPES.DAY] : true,
+  [SORT_TYPES.DAY]: true,
   [SORT_TYPES.EVENT]: false,
   [SORT_TYPES.TIME]: true,
-  [SORT_TYPES.OFFERS]:false,
+  [SORT_TYPES.OFFERS]: false,
   [SORT_TYPES.PRICE]: true,
 };
 
 function createSortItemTemplate(sortType, isChecked) {
-  const {type , isDisabled} = sortType;
+  const {type, isDisabled} = sortType;
 
   return `
     <div class="trip-sort__item  trip-sort__item--${type}">
