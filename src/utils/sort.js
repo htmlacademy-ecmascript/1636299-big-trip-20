@@ -7,7 +7,7 @@ if (!Array.prototype.toSorted) {
   };
 }
 
-const sort = {
+const sortPoint = {
   [SORT_TYPES.DAY]: (points) => points.toSorted(getDataDifference),
   [SORT_TYPES.PRICE]: (points) => points.toSorted(getPriceDifference),
   [SORT_TYPES.EVENT]: () => {
@@ -19,4 +19,4 @@ const sort = {
   [SORT_TYPES.TIME]: (points) => points.toSorted(getTimeDifference),
 };
 
-export {sort};
+export {sortPoint};
