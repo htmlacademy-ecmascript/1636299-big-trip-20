@@ -4,7 +4,7 @@ import ContentListView from '../view/list-view';
 import EmptyListMessage from '../view/empty-list-view';
 import SortView from '../view/sort-view';
 import PointPresenter from './point-presenter';
-import {sort} from '../utils/sort';
+import {sortPoint} from '../utils/sort';
 import {SORT_TYPES} from '../const';
 
 export default class EventPresenter {
@@ -27,16 +27,16 @@ export default class EventPresenter {
   }
 
   init() {
-    this.#eventPoints = sort[SORT_TYPES.DAY]([...this.#pointsModel.points]);
+    this.#eventPoints = sortPoint[SORT_TYPES.DAY]([...this.#pointsModel.points]);
 
     this.#renderEventsBoard();
   }
 
-  #renderPoint(point, offers, destinations) {
+  #renderPoint(point, offersModel, destinationModel) {
     const pointPresenter = new PointPresenter({
       listComponent: this.#listComponent.element,
-      offers: offers,
-      destinations: destinations,
+      offersModel: offersModel,
+      destinationModel: destinationModel,
       onDataChange: this.#handlePointChange,
       onModeChange: this.#handleModeChange
     });
@@ -48,8 +48,8 @@ export default class EventPresenter {
     this.#eventPoints.forEach((point) => {
       this.#renderPoint(
         point,
-        this.#offersModel.getOffersByType(point.type),
-        this.#destinationsModel.getDestinationById(point.destination)
+        this.#offersModel,
+        this.#destinationsModel,
       );
     });
   }
@@ -86,7 +86,7 @@ export default class EventPresenter {
 
   #sortPoints(sortType) {
     this.#currentSortType = sortType;
-    this.#eventPoints = sort[this.#currentSortType](this.#eventPoints);
+    this.#eventPoints = sortPoint[this.#currentSortType](this.#eventPoints);
   }
 
   #handlePointChange = (updatePoint) => {
