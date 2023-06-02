@@ -74,14 +74,14 @@ function getPriceDifference(pointA, pointB) {
 }
 
 export {
-  getPriceDifference,
-  getTimeDifference,
-  getDataDifference,
-  humanizePointDate,
   countTimeDuration,
   isPointDateExpired,
   isPointDateInFuture,
   isPointDateInPresent,
+  getPriceDifference,
+  getTimeDifference,
+  getDataDifference,
+  humanizePointDate,
   FULL_DATE_FORMAT,
   DATE_FORMAT,
   TIME_FORMAT
