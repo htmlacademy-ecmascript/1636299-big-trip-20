@@ -29,7 +29,7 @@ export default class PointsModel extends Observable {
     return this.#destinations;
   }
 
-  get events() {
+  get points() {
     return this.#points;
   }
 
