@@ -1,29 +1,51 @@
-import {render, RenderPosition} from './framework/render';
-import TripInfoView from './view/info-view';
-import FiltersView from './view/filter-view';
-import ContentPresenter from './presenter/content-presenter';
-import OffersModel from './model/offers-model';
-import DestinationsModel from './model/destinations-model';
+import TripPresenter from './presenter/trip-presenter';
+import FilterPresenter from './presenter/filter-presenter';
 import PointsModel from './model/points-model';
-import {generateFilter} from './utils/filter';
+import FilterModel from './model/filter-model';
+import InfoPresenter from './presenter/info-presenter';
+import {render} from './framework/render';
+import NewPointButtonView from './view/new-point-button-view';
 
-const filtersMainElement = document.querySelector('.trip-controls__filters');
-const tripMainElement = document.querySelector('.trip-main');
-const tripEventElement = document.querySelector('.trip-events');
+const siteTripMainElement = document.querySelector('.trip-main');
+const tripPointsElement = document.querySelector('.trip-events');
+const filtersContainerElement = document.querySelector('.trip-controls__filters');
 const pointsModel = new PointsModel();
-const destinationsModel = new DestinationsModel();
-const offersModel = new OffersModel();
+const filterModel = new FilterModel();
 
-const filters = generateFilter(pointsModel.points);
-
-const contentPresenter = new ContentPresenter({
-  eventContainer: tripEventElement,
+const tripPresenter = new TripPresenter({
+  tripContainer: tripPointsElement,
   pointsModel,
-  offersModel,
-  destinationsModel
+  filterModel,
+  onNewPointDestroy: handleNewPointFormClose
 });
 
-render(new TripInfoView(), tripMainElement, RenderPosition.AFTERBEGIN);
-render(new FiltersView({filters}), filtersMainElement);
+const filterPresenter = new FilterPresenter({
+  filterContainer: filtersContainerElement,
+  filterModel,
+  pointsModel
+});
 
-contentPresenter.init();
+const infoPresenter = new InfoPresenter({
+  infoContainer: siteTripMainElement,
+  pointsModel
+});
+
+const newPointButtonComponent = new NewPointButtonView({
+  onClick: handleNewPointButtonClick
+});
+
+function handleNewPointFormClose() {
+  newPointButtonComponent.element.disabled = false;
+}
+
+function handleNewPointButtonClick() {
+  tripPresenter.createPoint();
+  newPointButtonComponent.element.disabled = true;
+}
+
+render(newPointButtonComponent, siteTripMainElement);
+
+filterPresenter.init();
+infoPresenter.init();
+tripPresenter.init();
+

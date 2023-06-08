@@ -1,22 +1,37 @@
-const POINT_TYPES = {
-  TAXI: 'taxi',
-  BUS: 'bus',
-  TRAIN: 'train',
-  SHIP: 'ship',
-  DRIVE: 'drive',
-  FLIGHT: 'flight',
-  CHECK_IN: 'check-in',
-  SIGHTSEEING: 'sightseeing',
-  RESTAURANT: 'restaurant',
-};
+const WAYPOINTS = [
+  'Taxi',
+  'Bus',
+  'Train',
+  'Ship',
+  'Drive',
+  'Flight',
+  'Check-in',
+  'Sightseeing',
+  'Restaurant',
+];
+
+const DEFAULT_TYPE = 'Taxi';
+
+const CITIES = [
+  'Amsterdam',
+  'Chamonix',
+  'Geneva',
+  'Tokyo',
+  'Seoul',
+  'New York',
+  'Manila',
+  'Valencia',
+  'Paris'
+];
 
 const OFFERS = [
-  'Upgrade to a business class',
-  'Upgrade to coupe',
-  'Add meals',
-  'Choose seats',
   'Add luggage',
-  'Add premium service',
+  'Switch to comfort',
+  'Rent a car',
+  'Add breakfast',
+  'Book tickets',
+  'Lunch in city',
+  'Order Uber',
 ];
 
 const DESCRIPTIONS = [
@@ -28,30 +43,51 @@ const DESCRIPTIONS = [
   'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
   'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
   'Sed sed nisi sed augue convallis suscipit in sed felis.',
-  'Aliquam erat volutpat.',
-  'Nunc fermentum tortor ac porta dapibus.',
+  'Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.',
   'In rutrum ac purus sit amet tempus.',
 ];
 
-const FILTER_TYPES = {
-  FUTURE: 'Future',
-  PRESENT: 'Present',
-  PAST: 'Past',
-  EVERYTHING: 'Everything',
+const MIN_NUMBER = 10;
+const MAX_NUMBER = 1000;
+const MIN_COUNT_OFFER = 0;
+const MAX_COUNT_OFFER = 5;
+const MIN_COUNT_DESCRIPTION = 1;
+const MAX_COUNT_DESCRIPTION = 5;
+
+const POINT_EMPTY = {
+  type: DEFAULT_TYPE,
+  dateFrom: null,
+  dateTo: null,
+  basePrice: 0,
+  offers: [],
+  destination: null,
+  isFavorite: false
 };
 
-const MIN_PRICE = 5;
-const MAX_PRICE = 5000;
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past'
+};
 
-const MIN_DESTINATION_ID = 1;
-const MAX_DESTINATION_ID = 4;
-
-const SORT_TYPES = {
+const SortType = {
   DAY: 'day',
-  EVENT: 'event',
   TIME: 'time',
   PRICE: 'price',
-  OFFERS: 'offers',
 };
 
-export {POINT_TYPES, OFFERS, DESCRIPTIONS, FILTER_TYPES, MIN_PRICE, MAX_PRICE, MIN_DESTINATION_ID, MAX_DESTINATION_ID, SORT_TYPES};
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export {WAYPOINTS, CITIES, MAX_NUMBER, MIN_NUMBER, OFFERS, DESCRIPTIONS,
+  MAX_COUNT_DESCRIPTION, MIN_COUNT_DESCRIPTION, MIN_COUNT_OFFER, MAX_COUNT_OFFER, POINT_EMPTY, FilterType, SortType, UpdateType, UserAction};

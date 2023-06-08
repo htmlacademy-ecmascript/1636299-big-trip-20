@@ -1,17 +1,11 @@
-const getRandomArrayElement = (items) => items[Math.floor(Math.random() * items.length)];
+function getRandomArrayElement(element) {
+  return element[Math.floor(Math.random() * element.length)];
+}
 
-const getRandomNumber = (a, b) => {
+function getRandomNumber(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-  if (a < 0 || b < 0) {
-    return NaN;
-  }
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-  const result = Math.random() * (upper - lower + 1) + lower;
-
-  return Math.floor(result);
-};
-
-const updateItem = (items, update) => items.map((item) => item.id === update.id ? update : item);
-
-export {getRandomArrayElement, getRandomNumber, updateItem};
+export {getRandomArrayElement, getRandomNumber};

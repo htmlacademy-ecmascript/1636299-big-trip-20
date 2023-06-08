@@ -1,74 +1,101 @@
 import AbstractView from '../framework/view/abstract-view';
-import {humanizePointDate, countTimeDuration, DATE_FORMAT, TIME_FORMAT} from '../utils/points';
+import {
+  getRefinePointDateShort,
+  getRefinePointDateTime,
+  getRefineTimeDate,
+  getTimeDifference
+} from '../utils/points';
 
-const createPointTemplate = (point, offersByType, destinationById) => {
-  const {basePrice, dateFrom, dateTo, isFavorite, type, offers} = point;
-  const date = humanizePointDate(dateFrom, DATE_FORMAT);
-  const timeFrom = humanizePointDate(dateFrom, TIME_FORMAT);
-  const timeTo = humanizePointDate(dateTo, TIME_FORMAT);
-  const timeDuration = countTimeDuration(dateFrom, dateTo);
-  const favoriteClass = isFavorite ? 'event__favorite-btn--active' : '';
-  const findChosenOffers = (chosenOffers) => offersByType.filter((item) => chosenOffers.includes(item.id));
-  const createOfferTemplate = () => findChosenOffers(offers).map((item) => `<li class="event__offer"><span class="event__offer-title">${item.title}</span>&plus;&euro;&nbsp;<span class="event__offer-price">${item.price}</span></li>`).join('');
-  return `
-    <li class="trip-events__item">
-      <div class="event">
-        <time class="event__date" datetime="${dateFrom}">${date}</time>
-        <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
-        </div>
-        <h3 class="event__title">${type} ${destinationById.name}</h3>
-        </h3>
-        <div class="event__schedule">
-          <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom}">${timeFrom}</time>
-            &mdash;
-            <time class="event__end-time" datetime="${dateTo}">${timeTo}</time>
-          </p>
-          <p class="event__duration">${timeDuration}</p>
-        </div>
-        <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
-        </p>
-        <h4 class="visually-hidden">Offers:</h4>
-        <ul class="event__selected-offers">
-          ${createOfferTemplate()}
-        </ul>
-        <button class="event__favorite-btn ${favoriteClass}" type="button">
-          <span class="visually-hidden">Add to favorite</span>
-          <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-            <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-          </svg>
-        </button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
-      </div>
-    </li>`;
-};
+function createPointOffersTemplate(offers) {
+  return offers.map((offer) => `
+  <li class="event__offer">
+    <span class="event__offer-title">${offer.title}</span>
+    &plus;&euro;&nbsp;
+    <span class="event__offer-price">${offer.price}</span>
+  </li>`).join('');
+}
+
+function createPointTemplate(pointTrip, destinations, offers) {
+  const {basePrice, dateFrom, dateTo, type, isFavorite} = pointTrip;
+  const destination = destinations.find((element) => element.id === pointTrip.destination);
+  const isDestination = !destination;
+  const isDestinationName = isDestination ? '' : destination.name;
+
+  const currentOffers = offers.find((element) => element.type === type).offers;
+  const selectedOffers = pointTrip.offers.map((offerId) => currentOffers.find((element) => element.id === offerId));
+  const offersList = createPointOffersTemplate(selectedOffers);
+
+  const date = getRefinePointDateTime(dateFrom);
+  const dateShort = getRefinePointDateShort(dateFrom);
+  const dateStart = getRefineTimeDate(dateFrom);
+  const dateEnd = getRefineTimeDate(dateTo);
+  const dateGap = getTimeDifference(dateFrom, dateTo);
+
+  const favoriteClassName = isFavorite
+    ? 'event__favorite-btn event__favorite-btn--active'
+    : 'event__favorite-btn';
+
+  return (
+    `<li class="trip-events__item">
+       <div class="event">
+         <time class="event__date" datetime="${date}">${dateShort}</time>
+         <div class="event__type">
+           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
+         </div>
+         <h3 class="event__title">${type} ${isDestinationName}</h3>
+         <div class="event__schedule">
+           <p class="event__time">
+             <time class="event__start-time" datetime="${date}">${dateStart}</time>
+             &mdash;
+             <time class="event__end-time" datetime="${getRefinePointDateTime(dateTo)}">${dateEnd}</time>
+           </p>
+           <p class="event__duration">${dateGap}</p>
+         </div>
+         <p class="event__price">
+           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
+         </p>
+         <h4 class="visually-hidden">Offers:</h4>
+         <ul class="event__selected-offers">
+            ${offersList}
+         </ul>
+
+         <button class="${favoriteClassName}" type="button">
+           <span class="visually-hidden">Add to favorite</span>
+           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+             <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+           </svg>
+         </button>
+         <button class="event__rollup-btn" type="button">
+           <span class="visually-hidden">Open event</span>
+         </button>
+       </div>
+    </li>`
+  );
+}
 
 export default class PointView extends AbstractView {
-  #point = null;
-  #offers = null;
+  #pointTrip = null;
   #destinations = null;
+  #offers = null;
   #handleEditClick = null;
   #handleFavoriteClick = null;
 
-  constructor({point, offers, destinations, onEditClick, onFavoriteClick}) {
+  constructor({pointTrip, destinations, offers, onEditClick, onFavoriteClick}) {
     super();
-    this.#point = point;
-    this.#offers = offers;
+    this.#pointTrip = pointTrip;
     this.#destinations = destinations;
+    this.#offers = offers;
     this.#handleEditClick = onEditClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
-
-    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('.event__favorite-btn')
+      .addEventListener('click', this.#favoriteClickHandler);
   }
 
   get template() {
-    return createPointTemplate(this.#point, this.#offers, this.#destinations);
+    return createPointTemplate(this.#pointTrip, this.#destinations, this.#offers);
   }
 
   #editClickHandler = (evt) => {
