@@ -15,7 +15,7 @@ const tripPointsElement = document.querySelector('.trip-events');
 const filtersContainerElement = document.querySelector('.trip-controls__filters');
 
 const pointsModel = new PointsModel({
-  pointsApiServes: new PointsApiService(END_POINT, AUTHORIZATION)
+  PointsApiService: new PointsApiService(END_POINT, AUTHORIZATION)
 });
 
 const filterModel = new FilterModel();
