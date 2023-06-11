@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import duration from 'dayjs/plugin/duration';
-import {getRandomNumber} from './common';
 
 dayjs.extend(utc);
 dayjs.extend(duration);
@@ -10,29 +9,6 @@ const DATE_SHORT_FORMAT = 'MMM D';
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 const TIME_FORMAT = 'HH:mm';
 const DATE_FULL_FORMAT = 'DD/MM/YY HH:mm';
-const MIN_COUNT_DATE = 0;
-const MAX_DAY = 5;
-const MAX_HOUR = 10;
-const MAX_MIN = 59;
-
-function getDate() {
-  const minutesGap = getRandomNumber(MIN_COUNT_DATE, MAX_MIN);
-  const hoursGap = getRandomNumber(MIN_COUNT_DATE, MAX_HOUR);
-  const daysGap = getRandomNumber(MIN_COUNT_DATE, MAX_DAY);
-
-  const dateFrom = dayjs().subtract(getRandomNumber(MIN_COUNT_DATE, MAX_DAY), 'day').toDate();
-
-  const dateTo = dayjs(dateFrom)
-    .add(minutesGap, 'minute')
-    .add(hoursGap, 'hour')
-    .add(daysGap, 'day')
-    .toDate();
-
-  return {
-    from: dateFrom,
-    to: dateTo
-  };
-}
 
 function getRefinePointDateTime(date) {
   return date ? dayjs(date).utc().format(DATE_TIME_FORMAT) : '';
@@ -122,7 +98,6 @@ export {
   getTimeDifference,
   getRefineFullDate,
   getRefinePointDateTime,
-  getDate,
   isPointFuture,
   isPointPast,
   isPointPresent,
