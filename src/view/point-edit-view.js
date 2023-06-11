@@ -1,11 +1,13 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
-import {CITIES, POINT_EMPTY, WAYPOINTS} from '../const';
+import {POINT_EMPTY} from '../const';
 import {getRefineFullDate} from '../utils/points';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import he from 'he';
 
-function createPointEditTypeTemplate(currentType) {
-  return WAYPOINTS.map((type) => `
+function createPointEditTypeTemplate(offers, currentType) {
+  const WAYPOINTS_TYPE = offers.map((offer) => offer.type);
+  return WAYPOINTS_TYPE.map((type) => `
     <div class="event__type-item">
       <input id="event-type-${type}-1"
       class="event__type-input  visually-hidden"
@@ -18,8 +20,9 @@ function createPointEditTypeTemplate(currentType) {
     </div>`).join('');
 }
 
-function createDestinationCitiesTemplate() {
-  return CITIES.map((element) => `<option value="${element}"></option>`).join('');
+function createDestinationCitiesTemplate(destinations) {
+  const CITIES_NAME = destinations.map((element) => element.name);
+  return CITIES_NAME.map((element) => `<option value="${element}"></option>`).join('');
 }
 
 function createOffersTemplate(point, offers) {
@@ -60,8 +63,8 @@ function createPointEditTemplate({state, destinations, offers}) {
   const {basePrice, type, dateFrom, dateTo} = pointTrip;
   const dateFullFrom = getRefineFullDate(dateFrom);
   const dateFullTo = getRefineFullDate(dateTo);
-  const citiesTemplate = createDestinationCitiesTemplate();
   const offersList = createOffersTemplate(pointTrip, offers);
+  const citiesTemplate = createDestinationCitiesTemplate(destinations);
   const destination = destinations.find((element) => element.id === pointTrip.destination);
   const picturesList = createPicturesDestinationTemplate(destination);
   const buttonReset = createButtonResetTemplate(state);
@@ -84,7 +87,7 @@ function createPointEditTemplate({state, destinations, offers}) {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createPointEditTypeTemplate(type)}
+                ${createPointEditTypeTemplate(offers, type)}
               </fieldset>
             </div>
           </div>
@@ -94,7 +97,7 @@ function createPointEditTemplate({state, destinations, offers}) {
             ${type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1"
-            type="text" name="event-destination" value="${isDestinationName}" list="destination-list-1">
+            type="text" name="event-destination" value="${he.encode(isDestinationName)}" list="destination-list-1">
             <datalist id="destination-list-1"/>
               ${citiesTemplate}
             </datalist>
@@ -103,11 +106,11 @@ function createPointEditTemplate({state, destinations, offers}) {
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
             <input class="event__input  event__input--time" id="event-start-time-1" type="text"
-            name="event-start-time" value="${dateFullFrom}">
+            name="event-start-time" value="${he.encode(dateFullFrom)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
             <input class="event__input  event__input--time" id="event-end-time-1" type="text"
-            name="event-end-time" value="${dateFullTo}">
+            name="event-end-time" value="${he.encode(dateFullTo)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -116,7 +119,7 @@ function createPointEditTemplate({state, destinations, offers}) {
               &euro;
             </label>
             <input class="event__input  event__input--price" id="event-price-1"
-            type="text" name="event-price" value="${basePrice}"/>
+            type="number" min="0" name="event-price" value="${basePrice}"/>
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

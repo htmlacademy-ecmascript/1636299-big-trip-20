@@ -14,7 +14,7 @@ function createTripInfoTemplate() {
   );
 }
 
-export default class InfoView extends AbstractView {
+export default class TripInfoView extends AbstractView {
   #pointsModel = null;
 
   constructor({pointsModel}) {
