@@ -9,13 +9,6 @@ const DATE_SHORT_FORMAT = 'MMM D';
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 const TIME_FORMAT = 'HH:mm';
 const DATE_FULL_FORMAT = 'DD/MM/YY HH:mm';
-const MSEC_IN_SEC = 1000;
-const SEC_IN_MIN = 60;
-const MIN_IN_HOUR = 60;
-const HOUR_IN_DAY = 24;
-
-const MSEC_IN_HOUR = MIN_IN_HOUR * SEC_IN_MIN * MSEC_IN_SEC;
-const MSEC_IN_DAY = HOUR_IN_DAY * MSEC_IN_HOUR;
 
 function getRefinePointDateTime(date) {
   return date ? dayjs(date).utc().format(DATE_TIME_FORMAT) : '';
@@ -34,20 +27,37 @@ function getRefineFullDate(date) {
 }
 
 function getTimeDifference(dateFrom, dateTo) {
-  const timeDifference = dayjs(dateTo).diff(dayjs(dateFrom));
-  let durationPoint = 0;
-  switch (true) {
-    case (timeDifference >= MSEC_IN_DAY):
-      durationPoint = dayjs.duration(timeDifference).format('DD[D] HH[H] mm[M]');
-      break;
-    case (timeDifference >= MSEC_IN_HOUR):
-      durationPoint = dayjs.duration(timeDifference).format('HH[H] mm[M]');
-      break;
-    case (timeDifference < MSEC_IN_HOUR):
-      durationPoint = dayjs.duration(timeDifference).format('mm[M]');
-      break;
+  const timeDiff = dayjs.duration(dayjs(dateTo).diff(dateFrom));
+  const years = timeDiff.years();
+  const months = timeDiff.months();
+  const days = timeDiff.days();
+  const hours = timeDiff.hours();
+  const minutes = timeDiff.minutes();
+
+  let totalDays = 0;
+  if (years > 0) {
+    totalDays += years * 365;
   }
-  return durationPoint;
+  if (months > 0) {
+    totalDays += months * 30;
+  }
+  totalDays += days;
+
+  let durationPoint = '';
+
+  if (totalDays > 0) {
+    durationPoint += `${totalDays}D `;
+  }
+
+  if (hours > 0 || (totalDays === 0 && minutes === 0)) {
+    durationPoint += `${hours.toString().padStart(2, '0')}H `;
+  }
+
+  if (minutes > 0 || (totalDays === 0 && hours === 0)) {
+    durationPoint += `${minutes.toString().padStart(2, '0')}M`;
+  }
+
+  return durationPoint.trim();
 }
 
 function isPointFuture(dataFrom) {
