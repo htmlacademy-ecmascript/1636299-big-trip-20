@@ -6,12 +6,11 @@ export default class PointsModel extends Observable {
   #destinations = [];
   #offers = [];
   #pointsApiService = null;
+
   constructor({pointsApiService}) {
     super();
-    // this.#destinations = this.#generateDestinations();
-    // this.#offers = this.#generateOffers();
-    // this.#points = this.#generatePoints();
     this.#pointsApiService = pointsApiService;
+
   }
 
   get offers() {
@@ -43,7 +42,7 @@ export default class PointsModel extends Observable {
     this._notify(UpdateType.INIT);
   }
 
-  async updateEvent(updateType, update) {
+  async updatePoint(updateType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
@@ -51,7 +50,7 @@ export default class PointsModel extends Observable {
     }
 
     try {
-      const response = await this.#pointsApiService.updateEvent(update);
+      const response = await this.#pointsApiService.updatePoint(update);
       const updatedPoint = this.#adaptToClient(response);
       this.#points = [
         ...this.#points.slice(0, index),
@@ -64,7 +63,7 @@ export default class PointsModel extends Observable {
     }
   }
 
-  addEvent(updateType, update) {
+  addPoint(updateType, update) {
     this.#points = [
       update,
       ...this.#points,
@@ -73,7 +72,7 @@ export default class PointsModel extends Observable {
     this._notify(updateType, update);
   }
 
-  deleteEvent(updateType, update) {
+  deletePoint(updateType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {

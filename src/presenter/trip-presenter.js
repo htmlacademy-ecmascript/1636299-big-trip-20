@@ -1,5 +1,5 @@
 import {remove, render, RenderPosition} from '../framework/render';
-import ListView from '../view/list-view.js';
+import ListView from '../view/list-view';
 import SortView from '../view/sort-view';
 import TripListEmptyView from '../view/trip-list-empty-view';
 import PointPresenter from './point-presenter';
