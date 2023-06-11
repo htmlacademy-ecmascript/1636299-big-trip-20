@@ -21,6 +21,10 @@ export default class NewPointPresenter {
   }
 
   init() {
+    // if (this.#pointListContainer !== null) {
+    //   return;
+    // }
+
     this.#pointEditComponent = new PointEditView({
       destinations: this.#destinations,
       offers: this.#offers,

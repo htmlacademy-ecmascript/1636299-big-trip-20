@@ -158,15 +158,7 @@ export default class PointEditView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor({
-    pointTrip = POINT_EMPTY,
-    destinations,
-    offers,
-    onFormSubmit,
-    onToggleClick,
-    onDeleteClick,
-    onCanselClick
-  }) {
+  constructor({pointTrip = POINT_EMPTY, destinations, offers, onFormSubmit, onToggleClick, onDeleteClick, onCanselClick}) {
     super();
     this._setState(PointEditView.parsePointToState(pointTrip));
     this.#destinations = destinations;

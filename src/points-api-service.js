@@ -35,7 +35,8 @@ export default class PointsApiService extends ApiService {
   }
 
   #adaptToServer(point) {
-    const adaptedPoint = {...point,
+    const adaptedPoint = {
+      ...point,
       'base_price': point.basePrice,
       'date_from': point.dateFrom,
       'date_to': point.dateTo,

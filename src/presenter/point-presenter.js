@@ -1,4 +1,4 @@
-import PointView from '../view/point-view.js';
+import PointView from '../view/point-view';
 import {remove, render, replace} from '../framework/render';
 import PointEditView from '../view/point-edit-view';
 import {UpdateType, UserAction} from '../const';
