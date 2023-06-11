@@ -1,5 +1,5 @@
 import {remove, render, RenderPosition} from '../framework/render';
-import ListView from '../view/list-view';
+import TripListView from '../view/trip-list-view';
 import SortView from '../view/sort-view';
 import TripListEmptyView from '../view/trip-list-empty-view';
 import PointPresenter from './point-presenter';
@@ -14,7 +14,7 @@ export default class TripPresenter {
   #pointsModel = null;
   #filterModel = null;
 
-  #tripListComponent = new ListView();
+  #tripListComponent = new TripListView();
   #loadingComponent = new LoadingView();
   #sortComponent = null;
   #tripEmptyComponent = null;

@@ -1,4 +1,4 @@
-import InfoView from '../view/info-view';
+import TripInfoView from '../view/trip-info-view';
 import {render, RenderPosition} from '../framework/render';
 
 export default class InfoPresenter {
@@ -13,7 +13,7 @@ export default class InfoPresenter {
   }
 
   init() {
-    this.#infoComponent = new InfoView({
+    this.#infoComponent = new TripInfoView({
       pointsModel: this.#pointsModel
     });
 
