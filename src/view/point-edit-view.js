@@ -1,9 +1,18 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
-import {POINT_EMPTY} from '../const';
 import {getRefineFullDate} from '../utils/points';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
+
+const POINT_EMPTY = {
+  type: 'taxi',
+  dateFrom: null,
+  dateTo: null,
+  basePrice: 0,
+  offers: [],
+  destination: null,
+  isFavorite: false
+};
 
 function createPointEditTypeTemplate(offers, currentType) {
   const WAYPOINTS_TYPE = offers.map((offer) => offer.type);
@@ -48,30 +57,32 @@ function createPicturesDestinationTemplate(destination) {
   }
 }
 
-function createButtonResetTemplate(state) {
+function createButtonResetTemplate(state, isDisabled, isDeleting) {
   const isNewPoint = !state.id;
   return isNewPoint
-    ? '<button class="event__reset-btn" type="reset">Cancel</button>'
-    : `<button class="event__reset-btn" type="reset">Delete</button>
-      <button class="event__rollup-btn" type="button">
+    ? `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+        Cancel
+      </button>`
+    : `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+        ${isDeleting ? 'Deleting...' : 'Delete'}
+      </button>
+      <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
         <span class="visually-hidden">Open event</span>
       </button>`;
 }
 
 function createPointEditTemplate({state, destinations, offers}) {
   const pointTrip = state;
-  const {basePrice, type, dateFrom, dateTo} = pointTrip;
+  const {basePrice, type, dateFrom, dateTo, isDisabled, isSaving, isDeleting} = pointTrip;
   const dateFullFrom = getRefineFullDate(dateFrom);
   const dateFullTo = getRefineFullDate(dateTo);
   const offersList = createOffersTemplate(pointTrip, offers);
   const citiesTemplate = createDestinationCitiesTemplate(destinations);
   const destination = destinations.find((element) => element.id === pointTrip.destination);
   const picturesList = createPicturesDestinationTemplate(destination);
-  const buttonReset = createButtonResetTemplate(state);
+  const buttonReset = createButtonResetTemplate(state, isDeleting);
 
   const isDestination = !destination;
-  const isDestinationName = isDestination ? '' : destination.name;
-  const isDestinationDescription = isDestination ? '' : destination.description;
 
   return (
     `<li class="trip-events__item">
@@ -82,7 +93,7 @@ function createPointEditTemplate({state, destinations, offers}) {
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
             <div class="event__type-list">
               <fieldset class="event__type-group">
@@ -97,7 +108,7 @@ function createPointEditTemplate({state, destinations, offers}) {
             ${type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1"
-            type="text" name="event-destination" value="${he.encode(isDestinationName)}" list="destination-list-1">
+            type="text" name="event-destination" value="${isDestination ? '' : he.encode(destination.name)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
             <datalist id="destination-list-1"/>
               ${citiesTemplate}
             </datalist>
@@ -106,11 +117,11 @@ function createPointEditTemplate({state, destinations, offers}) {
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
             <input class="event__input  event__input--time" id="event-start-time-1" type="text"
-            name="event-start-time" value="${he.encode(dateFullFrom)}">
+            name="event-start-time" value="${he.encode(dateFullFrom)}" ${isDisabled ? 'disabled' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
             <input class="event__input  event__input--time" id="event-end-time-1" type="text"
-            name="event-end-time" value="${he.encode(dateFullTo)}">
+            name="event-end-time" value="${he.encode(dateFullTo)}" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -119,10 +130,10 @@ function createPointEditTemplate({state, destinations, offers}) {
               &euro;
             </label>
             <input class="event__input  event__input--price" id="event-price-1"
-            type="number" min="0" name="event-price" value="${basePrice}"/>
+            type="number" min="0" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}/>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
           ${buttonReset}
         </header>
         <section class="event__details">
@@ -135,7 +146,7 @@ function createPointEditTemplate({state, destinations, offers}) {
 
           ${isDestination ? '' : `<section class="event__section  event__section--destination">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${isDestinationDescription}</p>
+            <p class="event__destination-description">${isDestination ? '' : destination.description}</p>
 
             <div class="event__photos-container">
               <div class="event__photos-tape">
@@ -282,7 +293,7 @@ export default class PointEditView extends AbstractStatefulView {
     evt.preventDefault();
     this._setState({
       ...this._state,
-      basePrice: evt.target.value
+      basePrice: Number(evt.target.value)
     });
   };
 
@@ -340,7 +351,22 @@ export default class PointEditView extends AbstractStatefulView {
     );
   };
 
-  static parsePointToState = (pointTrip) => ({...pointTrip});
+  static parsePointToState(pointTrip) {
+    return {
+      ...pointTrip,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
+    };
+  }
 
-  static parseStateToPoint = (state) => state;
+  static parseStateToPoint(state) {
+    const point = state;
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
+    return point;
+  }
 }

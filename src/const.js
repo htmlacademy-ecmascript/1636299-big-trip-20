@@ -1,15 +1,3 @@
-const DEFAULT_TYPE = 'Taxi';
-
-const POINT_EMPTY = {
-  type: DEFAULT_TYPE,
-  dateFrom: null,
-  dateTo: null,
-  basePrice: 0,
-  offers: [],
-  destination: null,
-  isFavorite: false
-};
-
 const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
@@ -36,4 +24,10 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-export {POINT_EMPTY, FilterType, SortType, UpdateType, UserAction};
+const PathName = {
+  POINTS: 'points',
+  DESTINATIONS: 'destinations',
+  OFFERS: 'offers',
+};
+
+export {PathName, FilterType, SortType, UpdateType, UserAction};
