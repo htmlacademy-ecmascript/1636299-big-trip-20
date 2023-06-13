@@ -8,9 +8,17 @@ import {sortByDay, sortByPrice, sortByTime} from '../utils/points';
 import {filter} from '../utils/filter';
 import NewPointPresenter from './new-point-presenter';
 import LoadingView from '../view/loading-view';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
+import InfoPresenter from './info-presenter';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class TripPresenter {
   #tripContainer = null;
+  #infoContainer = null;
   #pointsModel = null;
   #filterModel = null;
 
@@ -21,21 +29,27 @@ export default class TripPresenter {
 
   #pointPresenters = new Map();
   #newPointPresenter = null;
+  #infoPresenter = null;
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
-  constructor({tripContainer, pointsModel, filterModel, onNewPointDestroy}) {
+  constructor({tripContainer, pointsModel, filterModel, onNewPointDestroy, infoContainer}) {
     this.#tripContainer = tripContainer;
+    this.#infoContainer = infoContainer;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
-
     this.#newPointPresenter = new NewPointPresenter({
       pointListContainer: this.#tripListComponent.element,
       onDataChange: this.#handleViewAction,
       onDestroy: onNewPointDestroy,
       destinations: this.destinations,
-      offers: this.offers
+      offers: this.offers,
+      onModeChange: this.#handleModeChange
     });
 
     this.#pointsModel.addObserver(this.#handleModelPoint);
@@ -81,18 +95,35 @@ export default class TripPresenter {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointsModel.updatePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setSaving();
+        try {
+          await this.#pointsModel.updatePoint(updateType, update);
+        } catch (err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_POINT:
-        this.#pointsModel.addPoint(updateType, update);
+        this.#newPointPresenter.setSaving();
+        try {
+          await this.#pointsModel.addPoint(updateType, update);
+        } catch (err) {
+          this.#newPointPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setDeleting();
+        try {
+          await this.#pointsModel.deletePoint(updateType, update);
+        } catch (err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelPoint = (updateType, data) => {
@@ -154,6 +185,19 @@ export default class TripPresenter {
     }));
   }
 
+  #renderInfo() {
+    const points = this.#pointsModel.points.sort(sortByDay);
+    const destinations = this.destinations;
+    const offers = this.offers;
+    this.#infoPresenter = new InfoPresenter({
+      infoContainer: this.#infoContainer,
+      points: points,
+      destinations: destinations,
+      offers: offers,
+    });
+    this.#infoPresenter.init();
+  }
+
   #renderLoading() {
     render(this.#loadingComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
   }
@@ -178,6 +222,7 @@ export default class TripPresenter {
     this.#newPointPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
+    this.#infoPresenter.destroy();
 
     remove(this.#sortComponent);
     remove(this.#loadingComponent);
@@ -205,6 +250,7 @@ export default class TripPresenter {
     }
 
     this.#renderSort();
+    this.#renderInfo();
     this.#renderTripList();
   }
 }
