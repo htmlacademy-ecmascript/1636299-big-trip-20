@@ -1,6 +1,8 @@
 import AbstractView from '../framework/view/abstract-view';
+import {getRefinePointDateDayShort, getRefinePointDateShort} from '../utils/points';
+import dayjs from 'dayjs';
 
-function createTripInfoTemplate(points, destinations, offers) {
+function createTripInfoSumTemplate(points, offers) {
   const sumPoints = points.map((element) => element.basePrice).reduce((a, b) => a + b);
 
   const allOffers = [];
@@ -14,13 +16,41 @@ function createTripInfoTemplate(points, destinations, offers) {
   const sumPointsTotal = sumPoints + sumOffers;
 
   return (
+    `<p class="trip-info__cost">
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">${sumPointsTotal}</span>
+    </p>`
+  );
+}
+
+function createTripInfoCitiesTemplate(points, destinations) {
+  const allDestinations = [];
+  points.forEach((point) => {
+    const destinationCurrent = destinations.find((element) => element.id === point.destination);
+    allDestinations.push(destinationCurrent);
+  });
+  const firstDestination = allDestinations[0].name;
+  const lastDestination = allDestinations[allDestinations.length - 1].name;
+  const middleDestination = allDestinations.length > 3 ? '...' : `&mdash; ${allDestinations[1].name} &mdash;`;
+
+  return (
+    `<h1 class="trip-info__title">${firstDestination} ${middleDestination} ${lastDestination}</h1>`
+  );
+}
+
+function createTripInfoTemplate(points, destinations, offers) {
+  const firstDatePoint = getRefinePointDateShort(points[0].dateFrom);
+  let lastDatePoint = getRefinePointDateShort(points[points.length - 1].dateTo);
+  if (dayjs(firstDatePoint).month() === dayjs(lastDatePoint).month()) {
+    lastDatePoint = getRefinePointDateDayShort(points[points.length - 1].dateTo);
+  }
+
+  return (
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
-        <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
-        <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;20</p>
+        ${createTripInfoCitiesTemplate(points, destinations)}
+        <p class="trip-info__dates">${firstDatePoint}&nbsp;&mdash;&nbsp;${lastDatePoint}</p>
       </div>
-      <p class="trip-info__cost">
-      Total: &euro;&nbsp;<span class="trip-info__cost-value">${sumPointsTotal}</span>      </p>
+      ${createTripInfoSumTemplate(points, offers)}
     </section>`
   );
 }

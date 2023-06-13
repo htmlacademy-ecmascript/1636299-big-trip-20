@@ -3,6 +3,7 @@ import {getRefineFullDate} from '../utils/points';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
+
 const POINT_DEFAULT = 'train';
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
@@ -15,6 +16,7 @@ const POINT_EMPTY = {
   destination: null,
   isFavorite: false
 };
+
 function createPointEditTypeTemplate(offers, currentType) {
   return POINT_TYPES.map((type) => `
     <div class="event__type-item">

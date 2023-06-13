@@ -70,18 +70,6 @@ export default class PointPresenter {
     remove(prevPointEditComponent);
   }
 
-  destroy() {
-    remove(this.#pointComponent);
-    remove(this.#pointEditComponent);
-  }
-
-  resetView() {
-    if (this.#mode !== Mode.DEFAULT) {
-      this.#pointEditComponent.reset(this.#pointTrip);
-      this.#replaceEditorToPoint();
-    }
-  }
-
   setSaving() {
     if (this.#mode === Mode.EDITING) {
       this.#pointEditComponent.updateElement({
@@ -115,6 +103,18 @@ export default class PointPresenter {
     };
 
     this.#pointEditComponent.shake(resetFormState);
+  }
+
+  destroy() {
+    remove(this.#pointComponent);
+    remove(this.#pointEditComponent);
+  }
+
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#pointEditComponent.reset(this.#pointTrip);
+      this.#replaceEditorToPoint();
+    }
   }
 
   #replacePointToEditor() {
