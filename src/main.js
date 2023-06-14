@@ -6,7 +6,7 @@ import PointsApiService from './points-api-service';
 import PointsModel from './model/points-model';
 import FilterModel from './model/filter-model';
 
-const AUTHORIZATION = 'Basic Sfdwqf1d6rflu9d';
+const AUTHORIZATION = 'Basic Sgdwqf1d8rflu9d';
 const END_POINT = 'https://20.ecmascript.pages.academy/big-trip';
 
 const siteTripMainElement = document.querySelector('.trip-main');

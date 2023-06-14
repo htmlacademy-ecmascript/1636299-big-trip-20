@@ -1,6 +1,7 @@
 import PointEditView from '../view/point-edit-view';
 import {remove, render, RenderPosition} from '../framework/render';
 import {UpdateType, UserAction} from '../const';
+import dayjs from 'dayjs';
 
 export default class NewPointPresenter {
   #pointListContainer = null;
@@ -38,19 +39,6 @@ export default class NewPointPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  destroy() {
-    if (this.#pointEditComponent === null) {
-      return;
-    }
-
-    this.#handleDestroy();
-
-    remove(this.#pointEditComponent);
-    this.#pointEditComponent = null;
-
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-  }
-
   setSaving() {
     this.#pointEditComponent.updateElement({
       isDisabled: true,
@@ -70,7 +58,29 @@ export default class NewPointPresenter {
     this.#pointEditComponent.shake(resetFormState);
   }
 
+  destroy() {
+    if (this.#pointEditComponent === null) {
+      return;
+    }
+
+    this.#handleDestroy();
+
+    remove(this.#pointEditComponent);
+    this.#pointEditComponent = null;
+
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  }
+
   #handleFormSubmit = (point) => {
+    if (!point.destination
+      || !point.dateFrom
+      || !point.dateTo
+      || !point.basePrice
+      || dayjs(point.dateTo) < dayjs(point.dateFrom)) {
+      this.#pointEditComponent.shake();
+      return;
+    }
+
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,

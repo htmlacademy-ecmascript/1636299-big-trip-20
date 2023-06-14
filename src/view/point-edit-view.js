@@ -4,8 +4,11 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import he from 'he';
 
+const POINT_DEFAULT = 'train';
+const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+
 const POINT_EMPTY = {
-  type: 'taxi',
+  type: POINT_DEFAULT,
   dateFrom: null,
   dateTo: null,
   basePrice: 0,
@@ -15,8 +18,7 @@ const POINT_EMPTY = {
 };
 
 function createPointEditTypeTemplate(offers, currentType) {
-  const WAYPOINTS_TYPE = offers.map((offer) => offer.type);
-  return WAYPOINTS_TYPE.map((type) => `
+  return POINT_TYPES.map((type) => `
     <div class="event__type-item">
       <input id="event-type-${type}-1"
       class="event__type-input  visually-hidden"
@@ -36,7 +38,10 @@ function createDestinationCitiesTemplate(destinations) {
 
 function createOffersTemplate(point, offers) {
   const isChecked = (offer) => point.offers.includes(offer.id) ? 'checked' : '';
-  const currentOffers = offers.find((element) => element.type === point.type).offers;
+  const currentOffers = offers.find((element) => element.type === point.type)?.offers || [];
+  if (currentOffers.length === 0) {
+    return '';
+  }
 
   return currentOffers.map((offer) => `
     <div class="event__offer-selector">
@@ -71,12 +76,12 @@ function createButtonResetTemplate(state, isDisabled, isDeleting) {
       </button>`;
 }
 
-function createPointEditTemplate({state, destinations, offers}) {
+function createPointEditTemplate({state, destinations, offers, isOffersEmpty}) {
   const pointTrip = state;
   const {basePrice, type, dateFrom, dateTo, isDisabled, isSaving, isDeleting} = pointTrip;
   const dateFullFrom = getRefineFullDate(dateFrom);
   const dateFullTo = getRefineFullDate(dateTo);
-  const offersList = createOffersTemplate(pointTrip, offers);
+  const offersList = offers.length > 0 ? createOffersTemplate(pointTrip, offers) : '';
   const citiesTemplate = createDestinationCitiesTemplate(destinations);
   const destination = destinations.find((element) => element.id === pointTrip.destination);
   const picturesList = createPicturesDestinationTemplate(destination);
@@ -105,7 +110,7 @@ function createPointEditTemplate({state, destinations, offers}) {
 
           <div class="event__field-group  event__field-group--destination">
             <label class="event__label  event__type-output" for="event-destination-1">
-            ${type}
+             ${!pointTrip.type ? POINT_DEFAULT : pointTrip.type}
             </label>
             <input class="event__input  event__input--destination" id="event-destination-1"
             type="text" name="event-destination" value="${isDestination ? '' : he.encode(destination.name)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
@@ -137,7 +142,7 @@ function createPointEditTemplate({state, destinations, offers}) {
           ${buttonReset}
         </header>
         <section class="event__details">
-          ${offers.length === 0 ? '' : `<section class="event__section  event__section--offers">
+          ${isOffersEmpty ? '' : `<section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
             <div class="event__available-offers">
             ${offersList}
@@ -192,10 +197,14 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   get template() {
+    const offersList = createOffersTemplate(this._state, this.#offers);
+    const isOffersEmpty = offersList === '';
+
     return createPointEditTemplate({
       state: this._state,
       destinations: this.#destinations,
-      offers: this.#offers
+      offers: this.#offers,
+      isOffersEmpty: isOffersEmpty
     });
   }
 

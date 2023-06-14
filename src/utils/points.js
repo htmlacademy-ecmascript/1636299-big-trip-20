@@ -12,6 +12,7 @@ dayjs.extend(isSameOrAfter);
 const DateFormat = {
   DATE_SHORT: 'MMM D',
   DATE_TIME: 'YYYY-MM-DDTHH:mm',
+  ONLY_DAY: 'DD',
   TIME: 'HH:mm',
   DATE_FULL: 'DD/MM/YY HH:mm',
   MINUTES: 'mm[M]',
@@ -19,21 +20,11 @@ const DateFormat = {
   DAYS_HOURS_MINUTES: 'DD[D] HH[H] mm[M]',
 };
 
-function getRefinePointDateTime(date) {
-  return date ? dayjs(date).utc().format(DateFormat.DATE_TIME) : '';
-}
-
-function getRefinePointDateShort(date) {
-  return date ? dayjs(date).utc().format(DateFormat.DATE_SHORT) : '';
-}
-
-function getRefineTimeDate(date) {
-  return date ? dayjs(date).utc().format(DateFormat.TIME) : '';
-}
-
-function getRefineFullDate(date) {
-  return date ? dayjs(date).utc().format(DateFormat.DATE_FULL) : '';
-}
+const getRefinePointDateTime = (date) => date ? dayjs(date).utc().format(DateFormat.DATE_TIME) : '';
+const getRefinePointDateShort = (date) => date ? dayjs(date).utc().format(DateFormat.DATE_SHORT) : '';
+const getRefinePointDateDayShort = (date) => date ? dayjs(date).utc().format(DateFormat.ONLY_DAY) : '';
+const getRefineTimeDate = (date) => date ? dayjs(date).utc().format(DateFormat.TIME) : '';
+const getRefineFullDate = (date) => date ? dayjs(date).utc().format(DateFormat.DATE_FULL) : '';
 
 function getTimeDifference(dateFrom, dateTo) {
   const timeDiff = dayjs.duration(dayjs(dateTo).diff(dateFrom));
@@ -69,17 +60,9 @@ function getTimeDifference(dateFrom, dateTo) {
   return durationPoint.trim();
 }
 
-function isPointFuture(dateFrom) {
-  return dayjs(dateFrom).isAfter(dayjs());
-}
-
-function isPointPresent(dateFrom, dateTo) {
-  return dayjs(dateFrom).isSameOrBefore((dayjs())) && dayjs(dateTo).isSameOrAfter((dayjs()));
-}
-
-function isPointPast(dateTo) {
-  return dayjs(dateTo).isBefore((dayjs()));
-}
+const isPointFuture = (dateFrom) => dayjs(dateFrom).isAfter(dayjs());
+const isPointPresent = (dateFrom, dateTo) => dayjs(dateFrom).isSameOrBefore((dayjs())) && dayjs(dateTo).isSameOrAfter((dayjs()));
+const isPointPast = (dateTo) => dayjs(dateTo).isBefore((dayjs()));
 
 function sortByDay(pointA, pointB) {
   if (dayjs(pointA.dateFrom).isAfter(dayjs(pointB.dateFrom))) {
@@ -93,17 +76,14 @@ function sortByDay(pointA, pointB) {
   }
 }
 
-function sortByTime(pointA, pointB) {
-  return dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom)) - dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
-}
+const sortByTime = (pointA, pointB) => dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom)) - dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
 
-function sortByPrice(pointA, pointB) {
-  return pointB.basePrice - pointA.basePrice;
-}
+const sortByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
 
 export {
   getRefinePointDateShort,
   getRefineTimeDate,
+  getRefinePointDateDayShort,
   getTimeDifference,
   getRefineFullDate,
   getRefinePointDateTime,
