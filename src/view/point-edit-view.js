@@ -38,7 +38,10 @@ function createDestinationCitiesTemplate(destinations) {
 
 function createOffersTemplate(point, offers) {
   const isChecked = (offer) => point.offers.includes(offer.id) ? 'checked' : '';
-  const currentOffers = offers.find((element) => element.type === point.type).offers;
+  const currentOffers = offers.find((element) => element.type === point.type)?.offers || [];
+  if (currentOffers.length === 0) {
+    return '';
+  }
 
   return currentOffers.map((offer) => `
     <div class="event__offer-selector">
@@ -73,7 +76,7 @@ function createButtonResetTemplate(state, isDisabled, isDeleting) {
       </button>`;
 }
 
-function createPointEditTemplate({state, destinations, offers}) {
+function createPointEditTemplate({state, destinations, offers, isOffersEmpty}) {
   const pointTrip = state;
   const {basePrice, type, dateFrom, dateTo, isDisabled, isSaving, isDeleting} = pointTrip;
   const dateFullFrom = getRefineFullDate(dateFrom);
@@ -139,7 +142,7 @@ function createPointEditTemplate({state, destinations, offers}) {
           ${buttonReset}
         </header>
         <section class="event__details">
-          ${offers.length === 0 ? '' : `<section class="event__section  event__section--offers">
+          ${isOffersEmpty ? '' : `<section class="event__section  event__section--offers">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
             <div class="event__available-offers">
             ${offersList}
@@ -194,10 +197,14 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   get template() {
+    const offersList = createOffersTemplate(this._state, this.#offers);
+    const isOffersEmpty = offersList === '';
+
     return createPointEditTemplate({
       state: this._state,
       destinations: this.#destinations,
-      offers: this.#offers
+      offers: this.#offers,
+      isOffersEmpty: isOffersEmpty
     });
   }
 

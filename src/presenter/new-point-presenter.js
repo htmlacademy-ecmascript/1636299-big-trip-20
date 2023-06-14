@@ -1,6 +1,7 @@
 import PointEditView from '../view/point-edit-view';
 import {remove, render, RenderPosition} from '../framework/render';
 import {UpdateType, UserAction} from '../const';
+import dayjs from 'dayjs';
 
 export default class NewPointPresenter {
   #pointListContainer = null;
@@ -71,6 +72,15 @@ export default class NewPointPresenter {
   }
 
   #handleFormSubmit = (point) => {
+    if (!point.destination
+      || !point.dateFrom
+      || !point.dateTo
+      || !point.basePrice
+      || dayjs(point.dateTo) < dayjs(point.dateFrom)) {
+      this.#pointEditComponent.shake();
+      return;
+    }
+
     this.#handleDataChange(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
