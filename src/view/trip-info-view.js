@@ -2,7 +2,7 @@ import AbstractView from '../framework/view/abstract-view';
 import {getRefinePointDateDayShort, getRefinePointDateShort} from '../utils/points';
 import dayjs from 'dayjs';
 
-function createTripInfoSumTemplate(points, offers) {
+const createTripInfoSumTemplate = (points, offers) => {
   const sumPoints = points.map((element) => element.basePrice).reduce((a, b) => a + b);
 
   const allOffers = [];
@@ -20,9 +20,9 @@ function createTripInfoSumTemplate(points, offers) {
       Total: &euro;&nbsp;<span class="trip-info__cost-value">${sumPointsTotal}</span>
     </p>`
   );
-}
+};
 
-function createTripInfoCitiesTemplate(points, destinations) {
+const createTripInfoCitiesTemplate = (points, destinations) => {
   const allDestinations = [];
   points.forEach((point) => {
     const destinationCurrent = destinations.find((element) => element.id === point.destination);
@@ -35,9 +35,9 @@ function createTripInfoCitiesTemplate(points, destinations) {
   return (
     `<h1 class="trip-info__title">${firstDestination} ${middleDestination} ${lastDestination}</h1>`
   );
-}
+};
 
-function createTripInfoTemplate(points, destinations, offers) {
+const createTripInfoTemplate = (points, destinations, offers) => {
   const firstDatePoint = getRefinePointDateShort(points[0].dateFrom);
   let lastDatePoint = getRefinePointDateShort(points[points.length - 1].dateTo);
   if (dayjs(firstDatePoint).month() === dayjs(lastDatePoint).month()) {
@@ -53,7 +53,7 @@ function createTripInfoTemplate(points, destinations, offers) {
       ${createTripInfoSumTemplate(points, offers)}
     </section>`
   );
-}
+};
 
 export default class TripInfoView extends AbstractView {
   #points = null;
