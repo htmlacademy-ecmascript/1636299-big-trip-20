@@ -6,16 +6,15 @@ import {
   getTimeDifference
 } from '../utils/points';
 
-function createPointOffersTemplate(offers) {
-  return offers.map((offer) => `
-  <li class="event__offer">
-    <span class="event__offer-title">${offer.title}</span>
-    &plus;&euro;&nbsp;
-    <span class="event__offer-price">${offer.price}</span>
-  </li>`).join('');
-}
+const createPointOffersTemplate = (offers) =>
+  offers.map((offer) => `
+    <li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </li>`).join('');
 
-function createPointTemplate(pointTrip, destinations, offers) {
+const createPointTemplate = (pointTrip, destinations, offers) => {
   const {basePrice, dateFrom, dateTo, type, isFavorite} = pointTrip;
   const destination = destinations.find((element) => element.id === pointTrip.destination);
   const isDestination = !destination;
@@ -71,7 +70,7 @@ function createPointTemplate(pointTrip, destinations, offers) {
        </div>
     </li>`
   );
-}
+};
 
 export default class PointView extends AbstractView {
   #pointTrip = null;

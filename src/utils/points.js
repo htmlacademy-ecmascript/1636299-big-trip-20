@@ -20,6 +20,9 @@ const DateFormat = {
   DAYS_HOURS_MINUTES: 'DD[D] HH[H] mm[M]',
 };
 
+const DAYS_IN_YEAR = 365;
+const DAYS_IN_MONTH = 30;
+
 const getRefinePointDateTime = (date) => date ? dayjs(date).utc().format(DateFormat.DATE_TIME) : '';
 const getRefinePointDateShort = (date) => date ? dayjs(date).utc().format(DateFormat.DATE_SHORT) : '';
 const getRefinePointDateDayShort = (date) => date ? dayjs(date).utc().format(DateFormat.ONLY_DAY) : '';
@@ -36,10 +39,10 @@ function getTimeDifference(dateFrom, dateTo) {
 
   let totalDays = 0;
   if (years > 0) {
-    totalDays += years * 365;
+    totalDays += years * DAYS_IN_YEAR;
   }
   if (months > 0) {
-    totalDays += months * 30;
+    totalDays += months * DAYS_IN_MONTH;
   }
   totalDays += days;
 

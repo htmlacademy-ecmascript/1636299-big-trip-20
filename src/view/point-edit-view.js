@@ -17,8 +17,8 @@ const POINT_EMPTY = {
   isFavorite: false
 };
 
-function createPointEditTypeTemplate(offers, currentType) {
-  return POINT_TYPES.map((type) => `
+const createPointEditTypeTemplate = (offers, currentType) => {
+  POINT_TYPES.map((type) => `
     <div class="event__type-item">
       <input id="event-type-${type}-1"
       class="event__type-input  visually-hidden"
@@ -29,14 +29,14 @@ function createPointEditTypeTemplate(offers, currentType) {
        />
       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
     </div>`).join('');
-}
+};
 
-function createDestinationCitiesTemplate(destinations) {
+const createDestinationCitiesTemplate = (destinations) => {
   const CITIES_NAME = destinations.map((element) => element.name);
   return CITIES_NAME.map((element) => `<option value="${element}"></option>`).join('');
-}
+};
 
-function createOffersTemplate(point, offers) {
+const createOffersTemplate = (point, offers) => {
   const isChecked = (offer) => point.offers.includes(offer.id) ? 'checked' : '';
   const currentOffers = offers.find((element) => element.type === point.type)?.offers || [];
   if (currentOffers.length === 0) {
@@ -53,16 +53,16 @@ function createOffersTemplate(point, offers) {
         <span class="event__offer-price">${offer.price}</span>
       </label>
     </div>`).join('');
-}
+};
 
-function createPicturesDestinationTemplate(destination) {
+const createPicturesDestinationTemplate = (destination) => {
   if (destination) {
     return destination.pictures.map((picture) => `
     <img class="event__photo" src="${picture.src}" alt="${picture.description}"/>`).join('');
   }
-}
+};
 
-function createButtonResetTemplate(state, isDisabled, isDeleting) {
+const createButtonResetTemplate = (state, isDisabled, isDeleting) => {
   const isNewPoint = !state.id;
   return isNewPoint
     ? `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
@@ -74,9 +74,9 @@ function createButtonResetTemplate(state, isDisabled, isDeleting) {
       <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
         <span class="visually-hidden">Open event</span>
       </button>`;
-}
+};
 
-function createPointEditTemplate({state, destinations, offers, isOffersEmpty}) {
+const createPointEditTemplate = ({state, destinations, offers, isOffersEmpty}) => {
   const pointTrip = state;
   const {basePrice, type, dateFrom, dateTo, isDisabled, isSaving, isDeleting} = pointTrip;
   const dateFullFrom = getRefineFullDate(dateFrom);
@@ -163,7 +163,7 @@ function createPointEditTemplate({state, destinations, offers, isOffersEmpty}) {
       </form>
     </li>`
   );
-}
+};
 
 export default class PointEditView extends AbstractStatefulView {
   #destinations = null;
@@ -208,22 +208,6 @@ export default class PointEditView extends AbstractStatefulView {
     });
   }
 
-  removeElement() {
-    super.removeElement();
-
-    if (this.#datepickerFrom) {
-      this.#datepickerFrom.destroy();
-      this.#datepickerFrom = null;
-    }
-
-    if (this.#datepickerTo) {
-      this.#datepickerTo.destroy();
-      this.#datepickerTo = null;
-    }
-  }
-
-  reset = (point) => this.updateElement(point);
-
   _restoreHandlers() {
     this.element.querySelector('form')
       .addEventListener('submit', this.#formSubmitHandler);
@@ -255,6 +239,22 @@ export default class PointEditView extends AbstractStatefulView {
 
     this.#setDatepicker();
   }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+
+    if (this.#datepickerTo) {
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
+  }
+
+  reset = (point) => this.updateElement(point);
 
   #toggleClickHandler = (evt) => {
     evt.preventDefault();

@@ -1,7 +1,5 @@
 import TripPresenter from './presenter/trip-presenter';
 import FilterPresenter from './presenter/filter-presenter';
-import {render} from './framework/render';
-import NewPointButtonView from './view/new-point-button-view';
 import PointsApiService from './points-api-service';
 import PointsModel from './model/points-model';
 import FilterModel from './model/filter-model';
@@ -13,7 +11,7 @@ const siteTripMainElement = document.querySelector('.trip-main');
 const tripPointsElement = document.querySelector('.trip-events');
 const filtersContainerElement = document.querySelector('.trip-controls__filters');
 
-async function main() {
+const main = async () => {
   const pointsModel = new PointsModel({
     pointsApiService: new PointsApiService(END_POINT, AUTHORIZATION)
   });
@@ -26,7 +24,6 @@ async function main() {
     tripContainer: tripPointsElement,
     pointsModel,
     filterModel,
-    onNewPointDestroy: handleNewPointFormClose,
     infoContainer: siteTripMainElement,
   });
 
@@ -36,27 +33,11 @@ async function main() {
     pointsModel
   });
 
-  const newPointButtonComponent = new NewPointButtonView({
-    onClick: handleNewPointButtonClick
-  });
-
-  function handleNewPointFormClose() {
-    newPointButtonComponent.element.disabled = false;
-  }
-
-  function handleNewPointButtonClick() {
-    tripPresenter.createPoint();
-    newPointButtonComponent.element.disabled = true;
-  }
-
   filterPresenter.init();
-  // infoPresenter.init();
   tripPresenter.init();
-  pointsModel.init()
-    .finally(() => {
-      render(newPointButtonComponent, siteTripMainElement);
-    });
-}
+  pointsModel.init();
+
+};
 
 main();
 
